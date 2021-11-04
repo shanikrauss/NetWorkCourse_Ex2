@@ -137,7 +137,7 @@ void main()
 	// Create a sockaddr_in object called server. 
 	sockaddr_in server;
 	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = inet_addr("13.52.80.36");
+	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server.sin_port = htons(TIME_PORT);
 
 	int userInput = 0;

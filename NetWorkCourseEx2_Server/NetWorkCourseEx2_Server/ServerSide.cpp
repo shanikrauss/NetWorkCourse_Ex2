@@ -7,8 +7,6 @@ using namespace std;
 #include <time.h>
 
 #define TIME_PORT	27015
-//#define HUD_PORT	27016
-//#define WHEATHER_PORT	27017
 
 void main()
 {
@@ -116,18 +114,99 @@ void main()
 			return;
 		}
 
-		char time1[255] = "Whats the time?";
 		recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
-		if (strcmp(recvBuff, time1) == 0)
+		time_t timer;
+		time_t secondes;
+		secondes = time(NULL);
+
+		struct tm * timeinfo;
+		time(&timer);
+		timeinfo = localtime(&timer);
+		int tm_sec = timeinfo->tm_sec;			/*seconds, range 0 to 59 */
+		int tm_min = timeinfo->tm_min;         /* minutes, range 0 to 59           */
+		int tm_hour = timeinfo->tm_hour;      /* hours, range 0 to 23             */
+		int tm_mday = timeinfo->tm_mday;       /* day of the month, range 1 to 31  */
+		int tm_mon = timeinfo->tm_mon;       /* month, range 0 to 11             */
+		int tm_year = timeinfo->tm_year;        /* The number of years since 1900   */
+		int tm_wday = timeinfo->tm_wday;       /* day of the week, range 0 to 6    */
+		int tm_yday = timeinfo->tm_yday;       /* day in the year, range 0 to 365  */
+		int tm_isdst = timeinfo->tm_isdst;
+
+
+		if (strcmp(recvBuff, "1") == 0)
 		{
 			cout << "Time Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			time_t timer;
-			time(&timer);
+			     /* daylight saving time*/
+
 			// Parse the current time to printable string.
 			strcpy(sendBuff, ctime(&timer));
 			sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
+
+
+			time_t t = time(NULL);
+			struct tm tm = *localtime(&t);
+			printf("now: %d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+		
+			time_t rawtime;
+			struct tm * timeinfo;
+
+			time(&rawtime);
+			timeinfo = localtime(&rawtime);
+			printf("Current local time and date: %s", asctime(timeinfo));
 		}
-		else if (strcmp(recvBuff, "How are you today?") == 0)
+		else if (strcmp(recvBuff, "2") == 0)
+		{
+			//cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "3") == 0)
+		{
+			sprintf(sendBuff, "%ld", secondes);
+		}
+		else if (strcmp(recvBuff, "4") == 0)
+		{
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "5") == 0)
+		{
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "6") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "7") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "8") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "9") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "10") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "11") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "12") == 0)
+		{
+			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			strcpy(sendBuff, "Great!!");
+		}
+		else if (strcmp(recvBuff, "13") == 0)
 		{
 			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
 			strcpy(sendBuff, "Great!!");
