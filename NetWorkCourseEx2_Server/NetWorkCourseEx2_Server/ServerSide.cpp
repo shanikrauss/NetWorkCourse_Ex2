@@ -156,8 +156,9 @@ void main()
 		}
 		else if (strcmp(recvBuff, "2") == 0)
 		{
+			sprintf(sendBuff, "%d:%d:%d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+
 			//cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
 		}
 		else if (strcmp(recvBuff, "3") == 0)
 		{
@@ -173,18 +174,17 @@ void main()
 		}
 		else if (strcmp(recvBuff, "6") == 0)
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			sprintf(sendBuff, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
+
 		}
 		else if (strcmp(recvBuff, "7") == 0)
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			sprintf(sendBuff, "%d", timeinfo->tm_year + 1900);
 		}
 		else if (strcmp(recvBuff, "8") == 0)
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			//sprintf(sendBuff, "%d%d", timeinfo->tm_hour, timeinfo->tm_min);
+
 		}
 		else if (strcmp(recvBuff, "9") == 0)
 		{
