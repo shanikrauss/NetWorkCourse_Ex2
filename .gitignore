@@ -3,6 +3,8 @@
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*.exe
+*.idb
 
 # Files built by Visual Studio
 *_i.c
