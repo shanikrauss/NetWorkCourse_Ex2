@@ -8,6 +8,10 @@ using namespace std;
 
 #define TIME_PORT	27015
 
+const char* dayNames[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+const char* monthNames[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+
 void main()
 {
 	// Initialize Winsock (Windows Sockets).
@@ -164,18 +168,15 @@ void main()
 		{
 			sprintf(sendBuff, "%ld", secondes);
 		}
-		else if (strcmp(recvBuff, "4") == 0)
+		else if (strcmp(recvBuff, "4") == 0) // DID NOT DO YET
 		{
-			strcpy(sendBuff, "Great!!");
 		}
-		else if (strcmp(recvBuff, "5") == 0)
+		else if (strcmp(recvBuff, "5") == 0) // DID NOT DO YET
 		{
-			strcpy(sendBuff, "Great!!");
 		}
 		else if (strcmp(recvBuff, "6") == 0)
 		{
 			sprintf(sendBuff, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
-
 		}
 		else if (strcmp(recvBuff, "7") == 0)
 		{
@@ -183,38 +184,43 @@ void main()
 		}
 		else if (strcmp(recvBuff, "8") == 0)
 		{
-			//sprintf(sendBuff, "%d%d", timeinfo->tm_hour, timeinfo->tm_min);
+			sprintf(sendBuff, "%s %s", dayNames[timeinfo->tm_wday], monthNames[timeinfo->tm_mon]);
 
 		}
 		else if (strcmp(recvBuff, "9") == 0)
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			int secondesInADay = 86400;
+			int secondesInHour = 3600;
+			int secondesFromBegainOfMonth = (timeinfo->tm_mday - 1) * secondesInADay + timeinfo->tm_hour*secondesInHour + timeinfo->tm_min * 60 + timeinfo->tm_sec;
+
+			sprintf(sendBuff, "secondes from begining of the month: %ld", secondesFromBegainOfMonth);
 		}
 		else if (strcmp(recvBuff, "10") == 0)
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday/4);
+
 		}
-		else if (strcmp(recvBuff, "11") == 0)
+		else if (strcmp(recvBuff, "11") == 0) 
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			if (timeinfo->tm_isdst != -1)
+			{
+				sprintf(sendBuff, "%d", timeinfo->tm_isdst);
+			}
+			else
+			{
+				strcpy(sendBuff, "This information is currently unavailable");
+			}
 		}
-		else if (strcmp(recvBuff, "12") == 0)
+		else if (strcmp(recvBuff, "12") == 0) // DID NOT DO YET
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
+			
 		}
-		else if (strcmp(recvBuff, "13") == 0)
+		else if (strcmp(recvBuff, "13") == 0) // DID NOT DO YET
 		{
-			cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Great!!");
 		}
 		else // (recvBuff == "Whats the wheather today?")
 		{
-			cout << "Wheather Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			strcpy(sendBuff, "Rainy today");
+			
 		}
 
 		// Answer client's request by the current time.

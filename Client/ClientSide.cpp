@@ -25,6 +25,10 @@ using namespace std;
 #define MeasureTimeLap 13
 #define EXIT_PROGRAM 14
 
+void clearScreen()
+{
+	system("cls");
+}
 
 void printUserMenu()
 {
@@ -194,6 +198,8 @@ void main()
 
 		recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 		cout << "Time Client: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+		Sleep(3);
+		clearScreen();
 	}
 
 
