@@ -1,6 +1,4 @@
-*.sln
 *.vs
-*.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
 *.exe
