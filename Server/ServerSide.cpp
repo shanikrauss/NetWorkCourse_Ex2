@@ -176,6 +176,8 @@ void main()
 		}
 		else if (strcmp(recvBuff, "5") == 0) // DID NOT DO YET
 		{
+			long int currTimeSecondes = GetTickCount();
+			sprintf(sendBuff, "%ld", currTimeSecondes);
 		}
 		else if (strcmp(recvBuff, "6") == 0)
 		{

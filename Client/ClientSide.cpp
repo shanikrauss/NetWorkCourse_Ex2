@@ -179,6 +179,13 @@ void main()
 			for (int i = 0; i < 100; i++) // send 100 request for whats the time
 			{
 				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
+				if (SOCKET_ERROR == bytesSent)
+				{
+					cout << "Time Client: Error at sendto(): " << WSAGetLastError() << endl;
+					closesocket(connSocket);
+					WSACleanup();
+					return;
+				}
 			}
 
 			
@@ -225,7 +232,41 @@ void main()
 		}
 
 
+		if (userInput == MeasureRTT)
+		{
+			double sum = 0;
+			for (int i = 0; i < 100; i++) // send 100 request for whats the time
+			{
+				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
+				long int timeClient = GetTickCount();
+				if (SOCKET_ERROR == bytesSent)
+				{
+					cout << "Time Client: Error at sendto(): " << WSAGetLastError() << endl;
+					closesocket(connSocket);
+					WSACleanup();
+					return;
+				}
 
+				bytesRecv = recv(connSocket, recvBuff, 255, 0);
+				if (SOCKET_ERROR == bytesRecv)
+				{
+					cout << "Time Client: Error at recv(): " << WSAGetLastError() << endl;
+					closesocket(connSocket);
+					WSACleanup();
+					return;
+				}
+
+				recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+				char *ptr;
+				long int timeServer = strtol(recvBuff, &ptr, 10);
+
+				sum += timeServer - timeClient;
+
+			}
+
+			double avg = (double)sum / 100; // there are 100 requsets
+			cout << "RTT: " << avg << endl;
+		}
 
 
 		else
