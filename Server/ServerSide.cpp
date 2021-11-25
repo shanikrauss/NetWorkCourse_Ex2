@@ -9,6 +9,14 @@ using namespace std;
 
 #define TIME_PORT	27015
 
+#define TOKYO (+9)
+#define MELBOURNE (+11)
+#define SAN_FRANCISCO (-8)
+#define PORTUGAL (-1)
+#define UTC (0)
+#define THREE_MIN 180
+
+
 const char* dayNames[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 const char* monthNames[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
@@ -108,6 +116,9 @@ void main()
 	// NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
 	cout << "Time Server: Wait for clients' requests.\n";
 
+	bool isMeasureTimeLapOn = false;
+	time_t startTimeMeasure;
+
 	while (true)
 	{
 		bytesRecv = recvfrom(m_socket, recvBuff, 255, 0, &client_addr, &client_addr_len);
@@ -141,9 +152,9 @@ void main()
 		if (strcmp(recvBuff, "1") == 0)
 		{
 			cout << "Time Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			     /* daylight saving time*/
+			/* daylight saving time*/
 
-			// Parse the current time to printable string.
+	   // Parse the current time to printable string.
 			strcpy(sendBuff, ctime(&timer));
 			sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
 
@@ -151,7 +162,7 @@ void main()
 			time_t t = time(NULL);
 			struct tm tm = *localtime(&t);
 			printf("now: %d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-		
+
 			time_t rawtime;
 			struct tm * timeinfo;
 
@@ -169,12 +180,12 @@ void main()
 		{
 			sprintf(sendBuff, "%ld", secondes);
 		}
-		else if (strcmp(recvBuff, "4") == 0) // DID NOT DO YET
+		else if (strcmp(recvBuff, "4") == 0)
 		{
 			long int currTimeSecondes = GetTickCount();
 			sprintf(sendBuff, "%ld", currTimeSecondes);
 		}
-		else if (strcmp(recvBuff, "5") == 0) // DID NOT DO YET
+		else if (strcmp(recvBuff, "5") == 0)
 		{
 			long int currTimeSecondes = GetTickCount();
 			sprintf(sendBuff, "%ld", currTimeSecondes);
@@ -202,10 +213,10 @@ void main()
 		}
 		else if (strcmp(recvBuff, "10") == 0)
 		{
-			sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday/4);
+			sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday / 4);
 
 		}
-		else if (strcmp(recvBuff, "11") == 0) 
+		else if (strcmp(recvBuff, "11") == 0)
 		{
 			if (timeinfo->tm_isdst != -1)
 			{
@@ -216,16 +227,52 @@ void main()
 				strcpy(sendBuff, "This information is currently unavailable");
 			}
 		}
-		else if (strcmp(recvBuff, "12") == 0) // DID NOT DO YET
+		else if (strcmp(recvBuff, "12") == 0) // PORTU NOT GOOD???
 		{
-			
+			struct tm * utcTime;
+			utcTime = gmtime(&timer);
+
+			sprintf(sendBuff, "\nTOKYO time: %d:%d:%d\n MELBOURNE time: %d:%d:%d\n SAN_FRANCISCO time: %d:%d:%d\n PORTUGAL time: %d:%d:%d\n UTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			/*
+			if (recvBuff[2] == TOKYO)
+			{
+				sprintf(sendBuff, "TOKYO time: %d:%d:%d\n MELBOURNE time: %d:%d:%d\n SAN_FRANCISCO time: %d:%d:%d\n PORTUGAL time: %d:%d:%d\n UTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			}
+			else if (recvBuff[2] == MELBOURNE)
+			{
+				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec);
+			}
+			else if (recvBuff[2] == SAN_FRANCISCO)
+			{
+				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec);
+			}
+			else if (recvBuff[2] == PORTUGAL)
+			{
+				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec);
+			}
+			else
+			{
+				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			}*/
 		}
 		else if (strcmp(recvBuff, "13") == 0) // DID NOT DO YET
 		{
+			if (!isMeasureTimeLapOn || timer - startTimeMeasure > THREE_MIN)
+			{
+				isMeasureTimeLapOn = true;
+				startTimeMeasure = timer;
+				sprintf(sendBuff, "Measure time started now.\nThe next request for measuring time will return the time measurement.");
+			}
+			else
+			{
+				isMeasureTimeLapOn = false;
+				sprintf(sendBuff, "The time measurement between both requests is: %d secondes", timer - startTimeMeasure);
+				startTimeMeasure = timer;
+			}
 		}
 		else // (recvBuff == "Whats the wheather today?")
 		{
-			
+
 		}
 
 		// Answer client's request by the current time.
@@ -246,6 +293,7 @@ void main()
 
 		cout << "Time Server: Sent: " << bytesSent << "\\" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
 	}
+
 
 	// Closing connections and Winsock.
 	cout << "Time Server: Closing Connection.\n";
