@@ -5,6 +5,7 @@ using namespace std;
 #include <winsock2.h>
 #include <string.h>
 #include <time.h>
+#include<windows.h>
 
 #define TIME_PORT	27015
 
@@ -170,6 +171,8 @@ void main()
 		}
 		else if (strcmp(recvBuff, "4") == 0) // DID NOT DO YET
 		{
+			long int currTimeSecondes = GetTickCount();
+			sprintf(sendBuff, "%ld", currTimeSecondes);
 		}
 		else if (strcmp(recvBuff, "5") == 0) // DID NOT DO YET
 		{
