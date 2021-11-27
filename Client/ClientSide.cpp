@@ -7,8 +7,7 @@ using namespace std;
 #include <string.h>
 
 #define TIME_PORT	27015
-//#define HUD_PORT	27016
-//#define WHEATHER_PORT	27017
+
 
 #define GetTime  1
 #define GetTimeWithoutDate  2
@@ -38,7 +37,7 @@ void printUserMenu()
 	std::cout << "3. What's the time now in seconds since 1.1.1970?" << endl;
 	std::cout << "4. what's the client to server delay estimation?" << endl;
 	std::cout << "5. Measure RTT please" << endl;
-	std::cout << "6. What's the time now? ('hour:seconds')" << endl;
+	std::cout << "6. What's the time now? ('hour:minutes')" << endl;
 	std::cout << "7. What year is it?" << endl;
 	std::cout << "8. What day and month is it today?" << endl;
 	std::cout << "9. How many seconds have passed since the beginning of the month?" << endl;
@@ -135,9 +134,7 @@ void main()
 	}
 
 	// For a client to communicate on a network, it must connect to a server.
-
 	// Need to assemble the required data for connection in sockaddr structure.
-
 	// Create a sockaddr_in object called server. 
 	sockaddr_in server;
 	server.sin_family = AF_INET;
@@ -169,9 +166,9 @@ void main()
 		// The fourth argument is an idicator specifying the way in which the call is made (0 for default).
 		// The two last arguments hold the details of the server to communicate with. 
 		// NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
+		
 		//int x = 1; // 3
 		//x = htonl(x); // 3
-
 		//bytesSent = sendto(connSocket, (char*)&x, 4, 0, (const sockaddr *)&server, sizeof(server)); //3
 
 		if (userInput == GetClientToServerDelayEstimation)
@@ -188,8 +185,6 @@ void main()
 				}
 			}
 
-			
-			
 			bytesRecv = recv(connSocket, recvBuff, 255, 0);
 			if (SOCKET_ERROR == bytesRecv)
 			{
@@ -202,7 +197,6 @@ void main()
 			recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 			char *ptr;
 			long int first = strtol(recvBuff, &ptr, 10);
-
 			double res = 0;
 			double sum = 0;
 
@@ -227,18 +221,17 @@ void main()
 			}
 
 			double avg = (double)sum / 99; // there are 99 pairs
-			cout << "Client To Server Delay Estimation is: " << avg << endl;
-
+			cout << "Client To Server Delay Estimation is: " << avg << " secondes" << endl;
 		}
 
-
-		if (userInput == MeasureRTT)
+		else if (userInput == MeasureRTT)
 		{
 			double sum = 0;
 			for (int i = 0; i < 100; i++) // send 100 request for whats the time
 			{
 				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
 				long int timeClient = GetTickCount();
+
 				if (SOCKET_ERROR == bytesSent)
 				{
 					cout << "Time Client: Error at sendto(): " << WSAGetLastError() << endl;
@@ -259,20 +252,16 @@ void main()
 				recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 				char *ptr;
 				long int timeServer = strtol(recvBuff, &ptr, 10);
-
 				sum += timeServer - timeClient;
-
 			}
 
 			double avg = (double)sum / 100; // there are 100 requsets
-			cout << "RTT: " << avg << endl;
+			cout << "RTT: " << avg << " secondes" << endl;
 		}
 
 
 		else
 		{
-
-
 			// regular
 			bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
 			if (SOCKET_ERROR == bytesSent)
@@ -297,10 +286,10 @@ void main()
 			recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 			cout << "Time Client: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
 		}
-		Sleep(3);
-		clearScreen();
+		//Sleep(3);
+		//clearScreen();
+		cout << endl << endl;
 	}
-
 
 	// Closing connections and Winsock.
 	cout << "Time Client: Closing Connection.\n";

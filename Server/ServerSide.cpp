@@ -66,9 +66,7 @@ void main()
 
 	// For a server to communicate on a network, it must first bind the socket to 
 	// a network address.
-
 	// Need to assemble the required data for connection in sockaddr structure.
-
 	// Create a sockaddr_in object called serverService. 
 	sockaddr_in serverService;
 	// Address family (must be AF_INET - Internet address family).
@@ -138,16 +136,17 @@ void main()
 		struct tm * timeinfo;
 		time(&timer);
 		timeinfo = localtime(&timer);
-		int tm_sec = timeinfo->tm_sec;			/*seconds, range 0 to 59 */
-		int tm_min = timeinfo->tm_min;         /* minutes, range 0 to 59           */
-		int tm_hour = timeinfo->tm_hour;      /* hours, range 0 to 23             */
-		int tm_mday = timeinfo->tm_mday;       /* day of the month, range 1 to 31  */
-		int tm_mon = timeinfo->tm_mon;       /* month, range 0 to 11             */
-		int tm_year = timeinfo->tm_year;        /* The number of years since 1900   */
-		int tm_wday = timeinfo->tm_wday;       /* day of the week, range 0 to 6    */
-		int tm_yday = timeinfo->tm_yday;       /* day in the year, range 0 to 365  */
+		/*
+		int tm_sec = timeinfo->tm_sec;			///*seconds, range 0 to 59 
+		int tm_min = timeinfo->tm_min;         ///* minutes, range 0 to 59           
+		int tm_hour = timeinfo->tm_hour;      /* hours, range 0 to 23             
+		int tm_mday = timeinfo->tm_mday;       /* day of the month, range 1 to 31  
+		int tm_mon = timeinfo->tm_mon;       /* month, range 0 to 11             
+		int tm_year = timeinfo->tm_year;        /* The number of years since 1900   
+		int tm_wday = timeinfo->tm_wday;       /* day of the week, range 0 to 6    
+		int tm_yday = timeinfo->tm_yday;       /* day in the year, range 0 to 365  
 		int tm_isdst = timeinfo->tm_isdst;
-
+		*/
 
 		if (strcmp(recvBuff, "1") == 0)
 		{
@@ -155,41 +154,41 @@ void main()
 			/* daylight saving time*/
 
 	   // Parse the current time to printable string.
-			strcpy(sendBuff, ctime(&timer));
-			sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
+			//strcpy(sendBuff, ctime(&timer));
 
+			//sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
 
 			time_t t = time(NULL);
 			struct tm tm = *localtime(&t);
 			printf("now: %d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-
+			sprintf(sendBuff, "%d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+			/*
 			time_t rawtime;
 			struct tm * timeinfo;
 
 			time(&rawtime);
 			timeinfo = localtime(&rawtime);
 			printf("Current local time and date: %s", asctime(timeinfo));
+			*/
 		}
 		else if (strcmp(recvBuff, "2") == 0)
 		{
 			sprintf(sendBuff, "%d:%d:%d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
-
-			//cout << "HUD Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
 		}
 		else if (strcmp(recvBuff, "3") == 0)
 		{
-			sprintf(sendBuff, "%ld", secondes);
+			sprintf(sendBuff, "The time now in seconds since 1.1.1970 is: %ld secondes", secondes);
 		}
-		else if (strcmp(recvBuff, "4") == 0)
+		else if (strcmp(recvBuff, "4") == 0 || strcmp(recvBuff, "5") == 0)
 		{
 			long int currTimeSecondes = GetTickCount();
 			sprintf(sendBuff, "%ld", currTimeSecondes);
 		}
-		else if (strcmp(recvBuff, "5") == 0)
+		/*else if (strcmp(recvBuff, "5") == 0)
 		{
 			long int currTimeSecondes = GetTickCount();
 			sprintf(sendBuff, "%ld", currTimeSecondes);
-		}
+		}*/
 		else if (strcmp(recvBuff, "6") == 0)
 		{
 			sprintf(sendBuff, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
@@ -201,7 +200,6 @@ void main()
 		else if (strcmp(recvBuff, "8") == 0)
 		{
 			sprintf(sendBuff, "%s %s", dayNames[timeinfo->tm_wday], monthNames[timeinfo->tm_mon]);
-
 		}
 		else if (strcmp(recvBuff, "9") == 0)
 		{
@@ -214,7 +212,6 @@ void main()
 		else if (strcmp(recvBuff, "10") == 0)
 		{
 			sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday / 4);
-
 		}
 		else if (strcmp(recvBuff, "11") == 0)
 		{
@@ -232,7 +229,7 @@ void main()
 			struct tm * utcTime;
 			utcTime = gmtime(&timer);
 
-			sprintf(sendBuff, "\nTOKYO time: %d:%d:%d\n MELBOURNE time: %d:%d:%d\n SAN_FRANCISCO time: %d:%d:%d\n PORTUGAL time: %d:%d:%d\n UTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			sprintf(sendBuff, "\nTOKYO time: %d:%d:%d\nMELBOURNE time: %d:%d:%d\nSAN_FRANCISCO time: %d:%d:%d\nPORTUGAL time: %d:%d:%d\nUTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
 			/*
 			if (recvBuff[2] == TOKYO)
 			{
@@ -255,7 +252,7 @@ void main()
 				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
 			}*/
 		}
-		else if (strcmp(recvBuff, "13") == 0) // DID NOT DO YET
+		else if (strcmp(recvBuff, "13") == 0) 
 		{
 			if (!isMeasureTimeLapOn || timer - startTimeMeasure > THREE_MIN)
 			{
@@ -276,10 +273,7 @@ void main()
 		}
 
 		// Answer client's request by the current time.
-
 		// Get the current time.
-
-
 		// Sends the answer to the client, using the client address gathered
 		// by recvfrom. 
 		bytesSent = sendto(m_socket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&client_addr, client_addr_len);
@@ -293,7 +287,6 @@ void main()
 
 		cout << "Time Server: Sent: " << bytesSent << "\\" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
 	}
-
 
 	// Closing connections and Winsock.
 	cout << "Time Server: Closing Connection.\n";
