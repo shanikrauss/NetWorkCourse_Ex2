@@ -175,7 +175,7 @@ void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv)
 		}
 		else
 		{
-			cout << "The time measurement between both requests is:" << recvBuff << "secondes" << endl;
+			cout << "The time measurement between both requests is: " << recvBuff << " secondes" << endl;
 		}
 	}
 }

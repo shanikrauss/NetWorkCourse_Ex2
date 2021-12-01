@@ -164,7 +164,7 @@ void main()
 		}
 		else if (strcmp(recvBuff, "2") == 0)
 		{
-			sprintf(sendBuff, "%d:%d:%d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+			sprintf(sendBuff, "%02d:%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 		}
 		else if (strcmp(recvBuff, "3") == 0)
 		{
@@ -183,7 +183,7 @@ void main()
 		}*/
 		else if (strcmp(recvBuff, "6") == 0)
 		{
-			sprintf(sendBuff, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
+			sprintf(sendBuff, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
 		}
 		else if (strcmp(recvBuff, "7") == 0)
 		{
@@ -223,7 +223,7 @@ void main()
 			struct tm * utcTime;
 			utcTime = gmtime(&timer);
 
-			sprintf(sendBuff, "\nTOKYO time: %d:%d:%d\nMELBOURNE time: %d:%d:%d\nSAN_FRANCISCO time: %d:%d:%d\PORTO time: %d:%d:%d\nUTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			sprintf(sendBuff, "\nTOKYO time: %02d:%02d:%02d\nMELBOURNE time: %02d:%02d:%02d\nSAN_FRANCISCO time: %02d:%02d:%02d\nPORTO time: %02d:%02d:%02d\nUTC time: %02d:%02d:%02d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
 			/*
 			if (recvBuff[2] == TOKYO)
 			{
