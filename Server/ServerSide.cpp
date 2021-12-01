@@ -12,19 +12,16 @@ using namespace std;
 #define TOKYO (+9)
 #define MELBOURNE (+11)
 #define SAN_FRANCISCO (-8)
-#define PORTUGAL (-1)
+#define PORTO (0)
 #define UTC (0)
 #define THREE_MIN 180
-
 
 const char* dayNames[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 const char* monthNames[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-
 void main()
 {
 	// Initialize Winsock (Windows Sockets).
-
 	// Create a WSADATA object called wsaData.
 	// The WSADATA structure contains information about the Windows 
 	// Sockets implementation.
@@ -42,9 +39,7 @@ void main()
 
 	// Server side:
 	// Create and bind a socket to an internet address.
-
 	// After initialization, a SOCKET object is ready to be instantiated.
-
 	// Create a SOCKET object called m_socket. 
 	// For this application:	use the Internet address family (AF_INET), 
 	//							datagram sockets (SOCK_DGRAM), 
@@ -82,7 +77,6 @@ void main()
 	serverService.sin_port = htons(TIME_PORT);
 
 	// Bind the socket for client's requests.
-
 	// The bind function establishes a connection to a specified socket.
 	// The function uses the socket handler, the sockaddr structure (which
 	// defines properties of the desired connection) and the length of the
@@ -96,7 +90,6 @@ void main()
 	}
 
 	// Waits for incoming requests from clients.
-
 	// Send and receive data.
 	sockaddr client_addr;
 	int client_addr_len = sizeof(client_addr);
@@ -151,11 +144,9 @@ void main()
 		if (strcmp(recvBuff, "1") == 0)
 		{
 			cout << "Time Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			/* daylight saving time*/
-
-	   // Parse the current time to printable string.
+			// daylight saving time
+			// Parse the current time to printable string.
 			//strcpy(sendBuff, ctime(&timer));
-
 			//sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
 
 			time_t t = time(NULL);
@@ -177,7 +168,8 @@ void main()
 		}
 		else if (strcmp(recvBuff, "3") == 0)
 		{
-			sprintf(sendBuff, "The time now in seconds since 1.1.1970 is: %ld secondes", secondes);
+			sprintf(sendBuff, "%ld", secondes);
+			//sprintf(sendBuff, "The time now in seconds since 1.1.1970 is: %ld secondes", secondes);
 		}
 		else if (strcmp(recvBuff, "4") == 0 || strcmp(recvBuff, "5") == 0)
 		{
@@ -207,11 +199,13 @@ void main()
 			int secondesInHour = 3600;
 			int secondesFromBegainOfMonth = (timeinfo->tm_mday - 1) * secondesInADay + timeinfo->tm_hour*secondesInHour + timeinfo->tm_min * 60 + timeinfo->tm_sec;
 
-			sprintf(sendBuff, "secondes from begining of the month: %ld", secondesFromBegainOfMonth);
+			sprintf(sendBuff, "%ld", secondesFromBegainOfMonth);
+			//sprintf(sendBuff, "secondes from begining of the month: %ld", secondesFromBegainOfMonth);
 		}
 		else if (strcmp(recvBuff, "10") == 0)
 		{
-			sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday / 4);
+			sprintf(sendBuff, "%d", timeinfo->tm_yday / 4);
+			//sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday / 4);
 		}
 		else if (strcmp(recvBuff, "11") == 0)
 		{
@@ -229,7 +223,7 @@ void main()
 			struct tm * utcTime;
 			utcTime = gmtime(&timer);
 
-			sprintf(sendBuff, "\nTOKYO time: %d:%d:%d\nMELBOURNE time: %d:%d:%d\nSAN_FRANCISCO time: %d:%d:%d\nPORTUGAL time: %d:%d:%d\nUTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			sprintf(sendBuff, "\nTOKYO time: %d:%d:%d\nMELBOURNE time: %d:%d:%d\nSAN_FRANCISCO time: %d:%d:%d\PORTO time: %d:%d:%d\nUTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
 			/*
 			if (recvBuff[2] == TOKYO)
 			{
@@ -258,12 +252,14 @@ void main()
 			{
 				isMeasureTimeLapOn = true;
 				startTimeMeasure = timer;
-				sprintf(sendBuff, "Measure time started now.\nThe next request for measuring time will return the time measurement.");
+				sprintf(sendBuff, "-1");
+				//sprintf(sendBuff, "Measure time started now.\nThe next request for measuring time will return the time measurement.");
 			}
 			else
 			{
 				isMeasureTimeLapOn = false;
-				sprintf(sendBuff, "The time measurement between both requests is: %d secondes", timer - startTimeMeasure);
+				sprintf(sendBuff, "%d", timer - startTimeMeasure);
+				//sprintf(sendBuff, "The time measurement between both requests is: %d secondes", timer - startTimeMeasure);
 				startTimeMeasure = timer;
 			}
 		}
