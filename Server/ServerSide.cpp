@@ -14,6 +14,7 @@ using namespace std;
 #define SAN_FRANCISCO (-8)
 #define PORTO (0)
 #define UTC (0)
+
 #define THREE_MIN 180
 
 const char* dayNames[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
@@ -141,6 +142,9 @@ void main()
 		int tm_isdst = timeinfo->tm_isdst;
 		*/
 
+		struct tm* utcTime;
+		utcTime = gmtime(&timer);
+
 		if (strcmp(recvBuff, "1") == 0)
 		{
 			cout << "Time Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
@@ -169,18 +173,12 @@ void main()
 		else if (strcmp(recvBuff, "3") == 0)
 		{
 			sprintf(sendBuff, "%ld", secondes);
-			//sprintf(sendBuff, "The time now in seconds since 1.1.1970 is: %ld secondes", secondes);
 		}
 		else if (strcmp(recvBuff, "4") == 0 || strcmp(recvBuff, "5") == 0)
 		{
 			long int currTimeSecondes = GetTickCount();
 			sprintf(sendBuff, "%ld", currTimeSecondes);
 		}
-		/*else if (strcmp(recvBuff, "5") == 0)
-		{
-			long int currTimeSecondes = GetTickCount();
-			sprintf(sendBuff, "%ld", currTimeSecondes);
-		}*/
 		else if (strcmp(recvBuff, "6") == 0)
 		{
 			sprintf(sendBuff, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
@@ -200,12 +198,10 @@ void main()
 			int secondesFromBegainOfMonth = (timeinfo->tm_mday - 1) * secondesInADay + timeinfo->tm_hour*secondesInHour + timeinfo->tm_min * 60 + timeinfo->tm_sec;
 
 			sprintf(sendBuff, "%ld", secondesFromBegainOfMonth);
-			//sprintf(sendBuff, "secondes from begining of the month: %ld", secondesFromBegainOfMonth);
 		}
 		else if (strcmp(recvBuff, "10") == 0)
 		{
 			sprintf(sendBuff, "%d", timeinfo->tm_yday / 4);
-			//sprintf(sendBuff, "num of week from begin year is: %d", timeinfo->tm_yday / 4);
 		}
 		else if (strcmp(recvBuff, "11") == 0)
 		{
@@ -218,13 +214,34 @@ void main()
 				strcpy(sendBuff, "This information is currently unavailable");
 			}
 		}
+		else if (strcmp(recvBuff, "1T") == 0)
+		{
+			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec);
+		}
+		else if (strcmp(recvBuff, "2M") == 0)
+		{
+			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec);
+		}
+		else if (strcmp(recvBuff, "3S") == 0)
+		{
+			sprintf(sendBuff, "%02d:%02d:%02d",(utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec);
+		}
+		else if (strcmp(recvBuff, "4P") == 0)
+		{
+			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec);
+		}
+		else if (strcmp(recvBuff, "5U") == 0)
+		{
+			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+		}
+		/*
 		else if (strcmp(recvBuff, "12") == 0) // PORTU NOT GOOD???
 		{
 			struct tm * utcTime;
 			utcTime = gmtime(&timer);
 
 			sprintf(sendBuff, "\nTOKYO time: %02d:%02d:%02d\nMELBOURNE time: %02d:%02d:%02d\nSAN_FRANCISCO time: %02d:%02d:%02d\nPORTO time: %02d:%02d:%02d\nUTC time: %02d:%02d:%02d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
-			/*
+			
 			if (recvBuff[2] == TOKYO)
 			{
 				sprintf(sendBuff, "TOKYO time: %d:%d:%d\n MELBOURNE time: %d:%d:%d\n SAN_FRANCISCO time: %d:%d:%d\n PORTUGAL time: %d:%d:%d\n UTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
@@ -244,8 +261,8 @@ void main()
 			else
 			{
 				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
-			}*/
-		}
+			}
+		}*/
 		else if (strcmp(recvBuff, "13") == 0) 
 		{
 			if (!isMeasureTimeLapOn || timer - startTimeMeasure > THREE_MIN)
@@ -253,18 +270,17 @@ void main()
 				isMeasureTimeLapOn = true;
 				startTimeMeasure = timer;
 				sprintf(sendBuff, "-1");
-				//sprintf(sendBuff, "Measure time started now.\nThe next request for measuring time will return the time measurement.");
 			}
 			else
 			{
 				isMeasureTimeLapOn = false;
 				sprintf(sendBuff, "%d", timer - startTimeMeasure);
-				//sprintf(sendBuff, "The time measurement between both requests is: %d secondes", timer - startTimeMeasure);
 				startTimeMeasure = timer;
 			}
 		}
 		else // (recvBuff == "Whats the wheather today?")
 		{
+		sprintf(sendBuff, "The server does not support this request");
 
 		}
 

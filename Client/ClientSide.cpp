@@ -1,10 +1,12 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-using namespace std;
 #pragma comment(lib, "Ws2_32.lib")
 #include <winsock2.h> 
 #include <string.h>
+
+using namespace std;
+
 
 #define TIME_PORT	27015
 
@@ -22,6 +24,13 @@ using namespace std;
 #define GET_TIME_WITHOUT_DATE_IN_CITY 12
 #define MEASURE_TIME_LAP 13
 #define EXIT_PROGRAM 14
+
+#define TOKYO 1
+#define MELBOURNE 2
+#define SAN_FRANCISCO 3
+#define PORTO 4
+#define UTC 5
+
 
 void clearScreen()
 {
@@ -41,13 +50,13 @@ void printUserMenu()
 	std::cout << "8. What day and month is it today?" << endl;
 	std::cout << "9. How many seconds have passed since the beginning of the month?" << endl;
 	std::cout << "10. How many weeks have passed since the beginning of the year?" << endl;
-	std::cout << "11. Is it Daylight saving time or winter clock?" << endl; // is it good?
+	std::cout << "11. Is it Daylight saving time or winter clock?" << endl;
 	std::cout << "12. What's the time now in different cities of the world?" << endl;
 	std::cout << "13. Please tell me the measure time lap" << endl;
 	std::cout << "14. Exit Program" << endl;
 }
 
-int updateUserInput(int userInput, char* sendBuff)
+void updateSendBuffByUserInput(int userInput, char* sendBuff, int city)
 {
 	if (userInput == GET_TIME)
 	{
@@ -95,18 +104,31 @@ int updateUserInput(int userInput, char* sendBuff)
 	}
 	else if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
 	{
-		strcpy(sendBuff, "12");
+		if (city == TOKYO)
+		{
+			strcpy(sendBuff, "1T");
+		}
+		else if (city == MELBOURNE)
+		{
+			strcpy(sendBuff, "2M");
+		}
+		else if (city == SAN_FRANCISCO)
+		{
+			strcpy(sendBuff, "3S");
+		}
+		else if (city == PORTO)
+		{
+			strcpy(sendBuff, "4P");
+		}
+		else // city == UTC
+		{
+			strcpy(sendBuff, "5U");
+		}
 	}
-	else if (userInput == MEASURE_TIME_LAP)
+	else // (userInput == MEASURE_TIME_LAP)
 	{
 		strcpy(sendBuff, "13");
 	}
-	else
-	{
-		return 0;
-	}
-
-	return 1;
 }
 
 bool socketError(int bytes, SOCKET connSocket, string errorAt)
@@ -122,7 +144,7 @@ bool socketError(int bytes, SOCKET connSocket, string errorAt)
 	return false;
 }
 
-void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv)
+void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv, int city, char* cityInput)
 {
 	cout << "Time Client: Recieved: " << bytesRecv << " bytes" << endl;
 	cout << "The message is:" << endl;
@@ -165,7 +187,28 @@ void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv)
 	}
 	else if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
 	{
-		cout << recvBuff << endl;
+		if (city == TOKYO)
+		{
+			cout << "TOKYO ";
+		}
+		else if (city == MELBOURNE)
+		{
+			cout << "MELBOURNE ";
+		}
+		else if (city == SAN_FRANCISCO)
+		{
+			cout << "SAN_FRANCISCO ";
+		}
+		else if (city == PORTO)
+		{
+			cout << "PORTO ";
+		}
+		else //(city == UTC)
+		{
+			cout << "The time in " << cityInput <<"that you asked is not avilable." << endl;
+			cout << "UTC ";
+		}
+		cout <<"time is: " << recvBuff << endl;
 	}
 	else if (userInput == MEASURE_TIME_LAP)
 	{
@@ -177,6 +220,72 @@ void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv)
 		{
 			cout << "The time measurement between both requests is: " << recvBuff << " secondes" << endl;
 		}
+	}
+	else
+	{
+		cout << recvBuff << endl;
+	}
+}
+
+bool notInRange(int input)
+{
+	if (input < 1 || input > 14)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void getUserInput(int* userInput)
+{
+	int input;
+	cin >> input;
+
+	while (!notInRange(input))
+	{
+		cout << "The input is not valid. Please choose a number from the options in the menu" << endl << endl;
+		printUserMenu();
+		cin >> input;
+	}
+
+	*userInput = input;
+}
+
+void printUserMenuCities()
+{
+	std::cout << "Please choose a city (enter a number or a name city thats not on the list):" << endl;
+	std::cout << "1. Tokyo - Japan" << endl;
+	std::cout << "2. Melbourne - Australia" << endl;
+	std::cout << "3. San Francisco - US" << endl;
+	std::cout << "4. Porto - Portugal " << endl;
+	std::cout << "5. Cities not listed above - Please indicate which city (up to 20 letters!!) " << endl;
+}
+void getUserInputCities(int* city, char* cityInput)
+{
+
+	char temp;
+	scanf("%c", &temp); // temp statement to clear buffer
+	fgets(cityInput, 21, stdin);
+
+	if (strcmp(cityInput, "1\n") == 0)
+	{
+		*city = TOKYO;
+	}
+	else if (strcmp(cityInput, "2\n") == 0)
+	{
+		*city = MELBOURNE;
+	}
+	else if (strcmp(cityInput, "3\n") == 0)
+	{
+		*city = SAN_FRANCISCO;
+	}
+	else if (strcmp(cityInput, "4\n") == 0)
+	{
+		*city = PORTO;
+	}
+	else {
+		*city = UTC;
 	}
 }
 
@@ -208,18 +317,22 @@ void main()
 
 	int userInput = 0;
 
+	printUserMenu();
+	getUserInput(&userInput);
+	int city = 0;
+	char cityInput[25];
+	if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
+	{
+		printUserMenuCities();
+		getUserInputCities(&city, cityInput);
+	}
+
 	while (userInput != EXIT_PROGRAM)
 	{
 		// Send and receive data.
-		printUserMenu();
-		cin >> userInput;
-
 		char sendBuff[255];
-
-		if (updateUserInput(userInput, sendBuff) == 0)
-		{
-			break;
-		}
+		
+		updateSendBuffByUserInput(userInput, sendBuff, city);
 
 		int bytesSent = 0;
 		int bytesRecv = 0;
@@ -230,9 +343,6 @@ void main()
 		// The fourth argument is an idicator specifying the way in which the call is made (0 for default).
 		// The two last arguments hold the details of the server to communicate with. 
 		// NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
-		//int x = 1; // 3
-		//x = htonl(x); // 3
-		//bytesSent = sendto(connSocket, (char*)&x, 4, 0, (const sockaddr *)&server, sizeof(server)); //3
 
 		if (userInput == GET_CLIENT_TO_SERVER_DELAY_ESTIMATION)
 		{
@@ -244,13 +354,6 @@ void main()
 				{
 					return;
 				}
-				/*if (SOCKET_ERROR == bytesSent)
-				{
-					cout << "Time Client: Error at sendto(): " << WSAGetLastError() << endl;
-					closesocket(connSocket);
-					WSACleanup();
-					return;
-				}*/
 			}
 
 			bytesRecv = recv(connSocket, recvBuff, 255, 0);
@@ -259,14 +362,7 @@ void main()
 			{
 				return;
 			}
-			/*if (SOCKET_ERROR == bytesRecv)
-			{
-				cout << "Time Client: Error at recv(): " << WSAGetLastError() << endl;
-				closesocket(connSocket);
-				WSACleanup();
-				return;
-			}*/
-
+	
 			recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 			char *ptr;
 			long int first = strtol(recvBuff, &ptr, 10);
@@ -276,19 +372,11 @@ void main()
 			for (int i = 0; i < 99; i++) // send 100 request for whats the time
 			{
 				bytesRecv = recv(connSocket, recvBuff, 255, 0);
-
 				if (socketError(bytesRecv, connSocket, " recv()"))
 				{
 					return;
 				}
-				/*if (SOCKET_ERROR == bytesRecv)
-				{
-					cout << "Time Client: Error at recv(): " << WSAGetLastError() << endl;
-					closesocket(connSocket);
-					WSACleanup();
-					return;
-				}*/
-
+			
 				recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 				char *ptr;
 				long int second = strtol(recvBuff, &ptr, 10);
@@ -298,7 +386,7 @@ void main()
 			}
 
 			double avg = (double)sum / 99; // there are 99 pairs
-			cout << "Client To Server Delay Estimation is: " << avg << " secondes" << endl;
+			cout << "Client To Server Delay Estimation is: " << avg << endl;
 		}
 
 		else if (userInput == MEASURE_RTT)
@@ -313,28 +401,11 @@ void main()
 					return;
 				}
 
-				/*if (SOCKET_ERROR == bytesSent)
-				{
-					cout << "Time Client: Error at sendto(): " << WSAGetLastError() << endl;
-					closesocket(connSocket);
-					WSACleanup();
-					return;
-				}*/
-
 				bytesRecv = recv(connSocket, recvBuff, 255, 0);
-
 				if (socketError(bytesRecv, connSocket, " recv()"))
 				{
 					return;
 				}
-
-				/*if (SOCKET_ERROR == bytesRecv)
-				{
-					cout << "Time Client: Error at recv(): " << WSAGetLastError() << endl;
-					closesocket(connSocket);
-					WSACleanup();
-					return;
-				}*/
 
 				recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 				char *ptr;
@@ -343,9 +414,8 @@ void main()
 			}
 
 			double avg = (double)sum / 100; // there are 100 requsets
-			cout << "RTT: " << avg << " secondes" << endl;
+			cout << "RTT: " << avg << endl;
 		}
-
 
 		else
 		{
@@ -356,45 +426,33 @@ void main()
 				return;
 			}
 
-			/*if (SOCKET_ERROR == bytesSent)
-			{
-				cout << "Time Client: Error at sendto(): " << WSAGetLastError() << endl;
-				closesocket(connSocket);
-				WSACleanup();
-				return;
-			}*/
 			cout << "Time Client: Sent: " << bytesSent << "/" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
 
 			// Gets the server's answer using simple recieve (no need to hold the server's address).
 			bytesRecv = recv(connSocket, recvBuff, 255, 0);
-
 			if (socketError(bytesRecv, connSocket, " recv()"))
 			{
 				return;
 			}
 
-			/*if (SOCKET_ERROR == bytesRecv)
-			{
-				cout << "Time Client: Error at recv(): " << WSAGetLastError() << endl;
-				closesocket(connSocket);
-				WSACleanup();
-				return;
-			}*/
-
 			recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
-			
-			printMessegeFromServer(userInput, recvBuff, bytesRecv);
-
-			//cout << "Time Client: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+			printMessegeFromServer(userInput, recvBuff, bytesRecv, city, cityInput);
 		}
 		//Sleep(3);
 		//clearScreen();
-		cout << endl << endl;
+		cout << endl;
+
+		printUserMenu();
+		getUserInput(&userInput);
+		if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
+		{
+			printUserMenuCities();
+			getUserInputCities(&city, cityInput);
+		}
 	}
 
 	// Closing connections and Winsock.
 	cout << "Time Client: Closing Connection.\n";
 	closesocket(connSocket);
-
 	system("pause");
 }
