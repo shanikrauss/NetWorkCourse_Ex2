@@ -32,11 +32,6 @@ using namespace std;
 #define UTC 5
 
 
-void clearScreen()
-{
-	system("cls");
-}
-
 void printUserMenu()
 {
 	std::cout << "Please choose an action:" << endl;
@@ -338,18 +333,12 @@ void main()
 		int bytesSent = 0;
 		int bytesRecv = 0;
 		char recvBuff[255];
-		// Asks the server what's the currnet time.
-		// The send function sends data on a connected socket.
-		// The buffer to be sent and its size are needed.
-		// The fourth argument is an idicator specifying the way in which the call is made (0 for default).
-		// The two last arguments hold the details of the server to communicate with. 
-		// NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
 
 		if (userInput == GET_CLIENT_TO_SERVER_DELAY_ESTIMATION)
 		{
 			for (int i = 0; i < 100; i++) // send 100 request for whats the time
 			{
-				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
+				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); 
 				
 				if (socketError(bytesSent, connSocket, "sendto()"))
 				{
@@ -439,10 +428,8 @@ void main()
 			recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 			printMessegeFromServer(userInput, recvBuff, bytesRecv, city, cityInput);
 		}
-		//Sleep(3);
-		//clearScreen();
-		cout << endl;
 
+		cout << endl;
 		printUserMenu();
 		getUserInput(&userInput);
 		if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
