@@ -142,7 +142,6 @@ void main()
 		int tm_isdst = timeinfo->tm_isdst;
 		*/
 		
-
 		if (strcmp(recvBuff, "1") == 0)
 		{
 			cout << "Time Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
@@ -186,7 +185,8 @@ void main()
 		}
 		else if (strcmp(recvBuff, "10") == 0)
 		{
-			sprintf(sendBuff, "%d", timeinfo->tm_yday / 4);
+			sprintf(sendBuff, "%d", timeinfo->tm_mon * 4 + (timeinfo->tm_mday % 7) + 1);
+			
 		}
 		else if (strcmp(recvBuff, "11") == 0)
 		{
