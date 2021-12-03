@@ -48,6 +48,10 @@ void printUserMenuCities();
 
 void getUserInputCities(int* city, char* cityInput);
 
+void measureRtt(SOCKET connSocket, char* sendBuff, sockaddr_in server, char* recvBuff);
+
+void clientToServerDelayEstimation(SOCKET connSocket, char* sendBuff, sockaddr_in server, char* recvBuff);
+
 void main()
 {
 	// Initialize Winsock (Windows Sockets).
@@ -99,7 +103,9 @@ void main()
 
 		if (userInput == GET_CLIENT_TO_SERVER_DELAY_ESTIMATION)
 		{
-			for (int i = 0; i < 100; i++) // send 100 request for whats the time
+			clientToServerDelayEstimation(connSocket, sendBuff, server, recvBuff);
+
+			/*for (int i = 0; i < 100; i++) // send 100 request for whats the time
 			{
 				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); 
 				
@@ -140,11 +146,14 @@ void main()
 
 			double avg = (double)sum / 99; // there are 99 pairs
 			cout << "Client To Server Delay Estimation is: " << avg << endl;
+			*/
 		}
 
 		else if (userInput == MEASURE_RTT)
 		{
-			double sum = 0;
+			measureRtt(connSocket, sendBuff, server, recvBuff);
+
+			/*double sum = 0;
 			for (int i = 0; i < 100; i++) // send 100 request for whats the time
 			{
 				bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
@@ -168,6 +177,7 @@ void main()
 
 			double avg = (double)sum / 100; // there are 100 requsets
 			cout << "RTT: " << avg << endl;
+			*/
 		}
 
 		else // all other requests
@@ -205,6 +215,86 @@ void main()
 	closesocket(connSocket);
 	system("pause");
 }
+
+void measureRtt(SOCKET connSocket, char* sendBuff, sockaddr_in server, char* recvBuff)
+{
+	int bytesSent = 0;
+	int bytesRecv = 0;
+	double sum = 0;
+
+	for (int i = 0; i < 100; i++) // send 100 request for whats the time
+	{
+		bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server)); // 2
+		long int timeClient = GetTickCount();
+		if (socketError(bytesSent, connSocket, "sendto()"))
+		{
+			return;
+		}
+
+		bytesRecv = recv(connSocket, recvBuff, 255, 0);
+		if (socketError(bytesRecv, connSocket, " recv()"))
+		{
+			return;
+		}
+
+		recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+		char* ptr;
+		long int timeServer = strtol(recvBuff, &ptr, 10);
+		sum += timeServer - timeClient;
+	}
+
+	double avg = (double)sum / 100; // there are 100 requsets
+	cout << "RTT: " << avg << endl;
+}
+
+void clientToServerDelayEstimation(SOCKET connSocket, char* sendBuff, sockaddr_in server, char* recvBuff)
+{
+	int bytesSent = 0;
+	int bytesRecv = 0;
+
+	for (int i = 0; i < 100; i++) // send 100 request for whats the time
+	{
+		bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
+
+		if (socketError(bytesSent, connSocket, "sendto()"))
+		{
+			return;
+		}
+	}
+
+	bytesRecv = recv(connSocket, recvBuff, 255, 0);
+
+	if (socketError(bytesRecv, connSocket, " recv()"))
+	{
+		return;
+	}
+
+	recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+	char* ptr;
+	long int first = strtol(recvBuff, &ptr, 10);
+	double res = 0;
+	double sum = 0;
+
+	for (int i = 0; i < 99; i++) // send 100 request for whats the time
+	{
+		bytesRecv = recv(connSocket, recvBuff, 255, 0);
+		if (socketError(bytesRecv, connSocket, " recv()"))
+		{
+			return;
+		}
+
+		recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+		char* ptr;
+		long int second = strtol(recvBuff, &ptr, 10);
+
+		sum += second - first;
+		first = second;
+	}
+
+	double avg = (double)sum / 99; // there are 99 pairs
+	cout << "Client To Server Delay Estimation is: " << avg << endl;
+}
+
 
 void printUserMenu()
 {
