@@ -241,35 +241,6 @@ void main()
 			gmtime(&timer);
 			sprintf(sendBuff, "%02d:%02d:%02d", (timeinfo->tm_hour + UTC) % 24, timeinfo->tm_min, timeinfo->tm_sec);
 		}
-		/*
-		else if (strcmp(recvBuff, "12") == 0) // PORTU NOT GOOD???
-		{
-			struct tm * utcTime;
-			utcTime = gmtime(&timer);
-
-			sprintf(sendBuff, "\nTOKYO time: %02d:%02d:%02d\nMELBOURNE time: %02d:%02d:%02d\nSAN_FRANCISCO time: %02d:%02d:%02d\nPORTO time: %02d:%02d:%02d\nUTC time: %02d:%02d:%02d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
-			
-			if (recvBuff[2] == TOKYO)
-			{
-				sprintf(sendBuff, "TOKYO time: %d:%d:%d\n MELBOURNE time: %d:%d:%d\n SAN_FRANCISCO time: %d:%d:%d\n PORTUGAL time: %d:%d:%d\n UTC time: %d:%d:%d\n", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec, (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
-			}
-			else if (recvBuff[2] == MELBOURNE)
-			{
-				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec);
-			}
-			else if (recvBuff[2] == SAN_FRANCISCO)
-			{
-				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec);
-			}
-			else if (recvBuff[2] == PORTUGAL)
-			{
-				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + PORTUGAL) % 24, utcTime->tm_min, utcTime->tm_sec);
-			}
-			else
-			{
-				sprintf(sendBuff, "%d:%d:%d", (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
-			}
-		}*/
 		else if (strcmp(recvBuff, "13") == 0) 
 		{
 			if (!isMeasureTimeLapOn || timer - startTimeMeasure > THREE_MIN)
