@@ -141,22 +141,24 @@ void main()
 		int tm_yday = timeinfo->tm_yday;       /* day in the year, range 0 to 365  
 		int tm_isdst = timeinfo->tm_isdst;
 		*/
-
-		struct tm* utcTime;
-		utcTime = gmtime(&timer);
+		
 
 		if (strcmp(recvBuff, "1") == 0)
 		{
 			cout << "Time Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
-			// daylight saving time
+			
 			// Parse the current time to printable string.
-			//strcpy(sendBuff, ctime(&timer));
-			//sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
-
+			strcpy(sendBuff, ctime(&timer));
+			sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
+	
+			/*
 			time_t t = time(NULL);
 			struct tm tm = *localtime(&t);
 			printf("now: %d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			sprintf(sendBuff, "%d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+			*/
+
+
 			/*
 			time_t rawtime;
 			struct tm * timeinfo;
@@ -216,23 +218,28 @@ void main()
 		}
 		else if (strcmp(recvBuff, "1T") == 0)
 		{
-			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + TOKYO) % 24, utcTime->tm_min, utcTime->tm_sec);
+			gmtime(&timer);
+			sprintf(sendBuff, "%02d:%02d:%02d", (timeinfo->tm_hour + TOKYO) % 24, timeinfo->tm_min, timeinfo->tm_sec);
 		}
 		else if (strcmp(recvBuff, "2M") == 0)
 		{
-			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + MELBOURNE) % 24, utcTime->tm_min, utcTime->tm_sec);
+			gmtime(&timer);
+			sprintf(sendBuff, "%02d:%02d:%02d", (timeinfo->tm_hour + MELBOURNE) % 24, timeinfo->tm_min, timeinfo->tm_sec);
 		}
 		else if (strcmp(recvBuff, "3S") == 0)
 		{
-			sprintf(sendBuff, "%02d:%02d:%02d",(utcTime->tm_hour + SAN_FRANCISCO) % 24, utcTime->tm_min, utcTime->tm_sec);
+			gmtime(&timer);
+			sprintf(sendBuff, "%02d:%02d:%02d",(timeinfo->tm_hour + SAN_FRANCISCO) % 24, timeinfo->tm_min, timeinfo->tm_sec);
 		}
 		else if (strcmp(recvBuff, "4P") == 0)
 		{
-			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + PORTO) % 24, utcTime->tm_min, utcTime->tm_sec);
+			gmtime(&timer);
+			sprintf(sendBuff, "%02d:%02d:%02d", (timeinfo->tm_hour + PORTO) % 24, timeinfo->tm_min, timeinfo->tm_sec);
 		}
 		else if (strcmp(recvBuff, "5U") == 0)
 		{
-			sprintf(sendBuff, "%02d:%02d:%02d", (utcTime->tm_hour + UTC) % 24, utcTime->tm_min, utcTime->tm_sec);
+			gmtime(&timer);
+			sprintf(sendBuff, "%02d:%02d:%02d", (timeinfo->tm_hour + UTC) % 24, timeinfo->tm_min, timeinfo->tm_sec);
 		}
 		/*
 		else if (strcmp(recvBuff, "12") == 0) // PORTU NOT GOOD???
@@ -278,10 +285,9 @@ void main()
 				startTimeMeasure = timer;
 			}
 		}
-		else // (recvBuff == "Whats the wheather today?")
+		else 
 		{
-		sprintf(sendBuff, "The server does not support this request");
-
+			sprintf(sendBuff, "The server does not support this request");
 		}
 
 		// Answer client's request by the current time.

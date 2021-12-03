@@ -261,6 +261,7 @@ void printUserMenuCities()
 	std::cout << "4. Porto - Portugal " << endl;
 	std::cout << "5. Cities not listed above - Please indicate which city (up to 20 letters!!) " << endl;
 }
+
 void getUserInputCities(int* city, char* cityInput)
 {
 
