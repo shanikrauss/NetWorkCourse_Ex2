@@ -32,258 +32,21 @@ using namespace std;
 #define UTC 5
 
 
-void printUserMenu()
-{
-	std::cout << "Please choose an action:" << endl;
-	std::cout << "1. What's the time and date?" << endl;
-	std::cout << "2. What's the time now?" << endl;
-	std::cout << "3. What's the time now in seconds since 1.1.1970?" << endl;
-	std::cout << "4. what's the client to server delay estimation?" << endl;
-	std::cout << "5. Measure RTT please" << endl;
-	std::cout << "6. What's the time now? ('hour:minutes')" << endl;
-	std::cout << "7. What year is it?" << endl;
-	std::cout << "8. What day and month is it today?" << endl;
-	std::cout << "9. How many seconds have passed since the beginning of the month?" << endl;
-	std::cout << "10. How many weeks have passed since the beginning of the year?" << endl;
-	std::cout << "11. Is it Daylight saving time or winter clock?" << endl;
-	std::cout << "12. What's the time now in different cities of the world?" << endl;
-	std::cout << "13. Please tell me the measure time lap" << endl;
-	std::cout << "14. Exit Program" << endl;
-}
+void printUserMenu();
 
-void updateSendBuffByUserInput(int userInput, char* sendBuff, int city)
-{
-	if (userInput == GET_TIME)
-	{
-		strcpy(sendBuff, "1");
-	}
-	else if (userInput == GET_TIME_WITHOUT_DATE)
-	{
-		strcpy(sendBuff, "2");
-	}
-	else if (userInput == GET_TIME_SINCE_EPOCH)
-	{
-		strcpy(sendBuff, "3");
-	}
-	else if (userInput == GET_CLIENT_TO_SERVER_DELAY_ESTIMATION)
-	{
-		strcpy(sendBuff, "4");
-	}
-	else if (userInput == MEASURE_RTT)
-	{
-		strcpy(sendBuff, "5");
-	}
-	else if (userInput == GET_TIME_WITHOUT_DATE_OR_SECONDES)
-	{
-		strcpy(sendBuff, "6");
-	}
-	else if (userInput == GET_YEAR)
-	{
-		strcpy(sendBuff, "7");
-	}
-	else if (userInput == GET_MONTH_AND_DAY)
-	{
-		strcpy(sendBuff, "8");
-	}
-	else if (userInput == GET_SECONDES_SINCE_BEGINING_OF_MONTH)
-	{
-		strcpy(sendBuff, "9");
-	}
-	else if (userInput == GET_WEEK_OF_YEAR)
-	{
-		strcpy(sendBuff, "10");
-	}
-	else if (userInput == GET_DAY_LIGHT_SAVINGS)
-	{
-		strcpy(sendBuff, "11");
-	}
-	else if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
-	{
-		if (city == TOKYO)
-		{
-			strcpy(sendBuff, "1T");
-		}
-		else if (city == MELBOURNE)
-		{
-			strcpy(sendBuff, "2M");
-		}
-		else if (city == SAN_FRANCISCO)
-		{
-			strcpy(sendBuff, "3S");
-		}
-		else if (city == PORTO)
-		{
-			strcpy(sendBuff, "4P");
-		}
-		else // city == UTC
-		{
-			strcpy(sendBuff, "5U");
-		}
-	}
-	else // (userInput == MEASURE_TIME_LAP)
-	{
-		strcpy(sendBuff, "13");
-	}
-}
+void updateSendBuffByUserInput(int userInput, char* sendBuff, int city);
 
-bool socketError(int bytes, SOCKET connSocket, string errorAt)
-{
-	if (SOCKET_ERROR == bytes)
-	{
-		cout << "Time Client: Error at" << errorAt <<":" << WSAGetLastError() << endl;
-		closesocket(connSocket);
-		WSACleanup();
-		return true;
-	}
+bool socketError(int bytes, SOCKET connSocket, string errorAt);
 
-	return false;
-}
+void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv, int city, char* cityInput);
 
-void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv, int city, char* cityInput)
-{
-	cout << "Time Client: Recieved: " << bytesRecv << " bytes" << endl;
-	cout << "The message is:" << endl;
+bool notInRange(int input);
 
-	if (userInput == GET_TIME)
-	{
-		cout << "The time is: " << recvBuff << endl;
-	}
-	else if (userInput == GET_TIME_WITHOUT_DATE)
-	{
-		cout << "The time (without date) is: " << recvBuff << endl;
-	}
-	else if (userInput == GET_TIME_SINCE_EPOCH)
-	{
-		cout << "The time now in seconds since 1.1.1970 is: " << recvBuff << " secondes" << endl; 
-	}
-	else if (userInput == GET_TIME_WITHOUT_DATE_OR_SECONDES)
-	{
-		cout << "The time (without date and secondes) is: " << recvBuff << endl;
-	}
-	else if (userInput == GET_YEAR)
-	{
-		cout << "The year is: " << recvBuff << endl;
-	}
-	else if (userInput == GET_MONTH_AND_DAY)
-	{
-		cout << "The month and day are: " << recvBuff << endl;
-	}
-	else if (userInput == GET_SECONDES_SINCE_BEGINING_OF_MONTH)
-	{
-		cout << "The amount of secondes from the begining of the month are: " << recvBuff << " secondes" << endl;
-	}
-	else if (userInput == GET_WEEK_OF_YEAR)
-	{
-		cout << "The number of the week from the beginning of the year is: " << recvBuff << endl; 
-	}
-	else if (userInput == GET_DAY_LIGHT_SAVINGS)
-	{
-		cout << "Day light savings is: " << recvBuff << endl;
-	}
-	else if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
-	{
-		if (city == TOKYO)
-		{
-			cout << "TOKYO ";
-		}
-		else if (city == MELBOURNE)
-		{
-			cout << "MELBOURNE ";
-		}
-		else if (city == SAN_FRANCISCO)
-		{
-			cout << "SAN_FRANCISCO ";
-		}
-		else if (city == PORTO)
-		{
-			cout << "PORTO ";
-		}
-		else //(city == UTC)
-		{
-			cout << "The time in " << cityInput <<"that you asked is not avilable." << endl;
-			cout << "UTC ";
-		}
-		cout <<"time is: " << recvBuff << endl;
-	}
-	else if (userInput == MEASURE_TIME_LAP)
-	{
-		if(strcmp(recvBuff, "-1") == 0)
-		{
-			cout << "Measure time started now." << endl << "The next request for measuring time will return the time measurement." << endl;
-		}
-		else
-		{
-			cout << "The time measurement between both requests is: " << recvBuff << " secondes" << endl;
-		}
-	}
-	else
-	{
-		cout << recvBuff << endl;
-	}
-}
+void getUserInput(int* userInput);
 
-bool notInRange(int input)
-{
-	if (input < 1 || input > 14)
-	{
-		return false;
-	}
+void printUserMenuCities();
 
-	return true;
-}
-
-void getUserInput(int* userInput)
-{
-	int input;
-	cin >> input;
-
-	while (!notInRange(input))
-	{
-		cout << "The input is not valid. Please choose a number from the options in the menu" << endl << endl;
-		printUserMenu();
-		cin >> input;
-	}
-
-	*userInput = input;
-}
-
-void printUserMenuCities()
-{
-	std::cout << "Please choose a city (enter a number or a name city thats not on the list):" << endl;
-	std::cout << "1. Tokyo - Japan" << endl;
-	std::cout << "2. Melbourne - Australia" << endl;
-	std::cout << "3. San Francisco - US" << endl;
-	std::cout << "4. Porto - Portugal " << endl;
-	std::cout << "5. Cities not listed above - Please indicate which city (up to 20 letters!!) " << endl;
-}
-
-void getUserInputCities(int* city, char* cityInput)
-{
-
-	char temp;
-	scanf("%c", &temp); // temp statement to clear buffer
-	fgets(cityInput, 21, stdin);
-
-	if (strcmp(cityInput, "1\n") == 0)
-	{
-		*city = TOKYO;
-	}
-	else if (strcmp(cityInput, "2\n") == 0)
-	{
-		*city = MELBOURNE;
-	}
-	else if (strcmp(cityInput, "3\n") == 0)
-	{
-		*city = SAN_FRANCISCO;
-	}
-	else if (strcmp(cityInput, "4\n") == 0)
-	{
-		*city = PORTO;
-	}
-	else {
-		*city = UTC;
-	}
-}
+void getUserInputCities(int* city, char* cityInput);
 
 void main()
 {
@@ -407,9 +170,8 @@ void main()
 			cout << "RTT: " << avg << endl;
 		}
 
-		else
+		else // all other requests
 		{
-			// regular
 			bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr *)&server, sizeof(server)); // 2
 			if (socketError(bytesSent, connSocket, "sendto()"))
 			{
@@ -418,7 +180,6 @@ void main()
 
 			cout << "Time Client: Sent: " << bytesSent << "/" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
 
-			// Gets the server's answer using simple recieve (no need to hold the server's address).
 			bytesRecv = recv(connSocket, recvBuff, 255, 0);
 			if (socketError(bytesRecv, connSocket, " recv()"))
 			{
@@ -443,4 +204,257 @@ void main()
 	cout << "Time Client: Closing Connection.\n";
 	closesocket(connSocket);
 	system("pause");
+}
+
+void printUserMenu()
+{
+	std::cout << "Please choose an action:" << endl;
+	std::cout << "1. What's the time and date?" << endl;
+	std::cout << "2. What's the time now?" << endl;
+	std::cout << "3. What's the time now in seconds since 1.1.1970?" << endl;
+	std::cout << "4. what's the client to server delay estimation?" << endl;
+	std::cout << "5. Measure RTT please" << endl;
+	std::cout << "6. What's the time now? ('hour:minutes')" << endl;
+	std::cout << "7. What year is it?" << endl;
+	std::cout << "8. What day and month is it today?" << endl;
+	std::cout << "9. How many seconds have passed since the beginning of the month?" << endl;
+	std::cout << "10. How many weeks have passed since the beginning of the year?" << endl;
+	std::cout << "11. Is it Daylight saving time or winter clock?" << endl;
+	std::cout << "12. What's the time now in different cities of the world?" << endl;
+	std::cout << "13. Please tell me the measure time lap" << endl;
+	std::cout << "14. Exit Program" << endl;
+}
+
+void updateSendBuffByUserInput(int userInput, char* sendBuff, int city)
+{
+	if (userInput == GET_TIME)
+	{
+		strcpy(sendBuff, "1");
+	}
+	else if (userInput == GET_TIME_WITHOUT_DATE)
+	{
+		strcpy(sendBuff, "2");
+	}
+	else if (userInput == GET_TIME_SINCE_EPOCH)
+	{
+		strcpy(sendBuff, "3");
+	}
+	else if (userInput == GET_CLIENT_TO_SERVER_DELAY_ESTIMATION)
+	{
+		strcpy(sendBuff, "4");
+	}
+	else if (userInput == MEASURE_RTT)
+	{
+		strcpy(sendBuff, "5");
+	}
+	else if (userInput == GET_TIME_WITHOUT_DATE_OR_SECONDES)
+	{
+		strcpy(sendBuff, "6");
+	}
+	else if (userInput == GET_YEAR)
+	{
+		strcpy(sendBuff, "7");
+	}
+	else if (userInput == GET_MONTH_AND_DAY)
+	{
+		strcpy(sendBuff, "8");
+	}
+	else if (userInput == GET_SECONDES_SINCE_BEGINING_OF_MONTH)
+	{
+		strcpy(sendBuff, "9");
+	}
+	else if (userInput == GET_WEEK_OF_YEAR)
+	{
+		strcpy(sendBuff, "10");
+	}
+	else if (userInput == GET_DAY_LIGHT_SAVINGS)
+	{
+		strcpy(sendBuff, "11");
+	}
+	else if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
+	{
+		if (city == TOKYO)
+		{
+			strcpy(sendBuff, "1T");
+		}
+		else if (city == MELBOURNE)
+		{
+			strcpy(sendBuff, "2M");
+		}
+		else if (city == SAN_FRANCISCO)
+		{
+			strcpy(sendBuff, "3S");
+		}
+		else if (city == PORTO)
+		{
+			strcpy(sendBuff, "4P");
+		}
+		else // city == UTC
+		{
+			strcpy(sendBuff, "5U");
+		}
+	}
+	else // (userInput == MEASURE_TIME_LAP)
+	{
+		strcpy(sendBuff, "13");
+	}
+}
+
+bool socketError(int bytes, SOCKET connSocket, string errorAt)
+{
+	if (SOCKET_ERROR == bytes)
+	{
+		cout << "Time Client: Error at" << errorAt << ":" << WSAGetLastError() << endl;
+		closesocket(connSocket);
+		WSACleanup();
+		return true;
+	}
+
+	return false;
+}
+
+void printMessegeFromServer(int userInput, char* recvBuff, int bytesRecv, int city, char* cityInput)
+{
+	cout << "Time Client: Recieved: " << bytesRecv << " bytes" << endl;
+	cout << "The message is:" << endl;
+
+	if (userInput == GET_TIME)
+	{
+		cout << "The time is: " << recvBuff << endl;
+	}
+	else if (userInput == GET_TIME_WITHOUT_DATE)
+	{
+		cout << "The time (without date) is: " << recvBuff << endl;
+	}
+	else if (userInput == GET_TIME_SINCE_EPOCH)
+	{
+		cout << "The time now in seconds since 1.1.1970 is: " << recvBuff << " secondes" << endl;
+	}
+	else if (userInput == GET_TIME_WITHOUT_DATE_OR_SECONDES)
+	{
+		cout << "The time (without date and secondes) is: " << recvBuff << endl;
+	}
+	else if (userInput == GET_YEAR)
+	{
+		cout << "The year is: " << recvBuff << endl;
+	}
+	else if (userInput == GET_MONTH_AND_DAY)
+	{
+		cout << "The month and day are: " << recvBuff << endl;
+	}
+	else if (userInput == GET_SECONDES_SINCE_BEGINING_OF_MONTH)
+	{
+		cout << "The amount of secondes from the begining of the month are: " << recvBuff << " secondes" << endl;
+	}
+	else if (userInput == GET_WEEK_OF_YEAR)
+	{
+		cout << "The number of the week from the beginning of the year is: " << recvBuff << endl;
+	}
+	else if (userInput == GET_DAY_LIGHT_SAVINGS)
+	{
+		cout << "Day light savings is: " << recvBuff << endl;
+	}
+	else if (userInput == GET_TIME_WITHOUT_DATE_IN_CITY)
+	{
+		if (city == TOKYO)
+		{
+			cout << "TOKYO ";
+		}
+		else if (city == MELBOURNE)
+		{
+			cout << "MELBOURNE ";
+		}
+		else if (city == SAN_FRANCISCO)
+		{
+			cout << "SAN_FRANCISCO ";
+		}
+		else if (city == PORTO)
+		{
+			cout << "PORTO ";
+		}
+		else //(city == UTC)
+		{
+			cout << "The time in " << cityInput << "that you asked is not avilable." << endl;
+			cout << "UTC ";
+		}
+		cout << "time is: " << recvBuff << endl;
+	}
+	else if (userInput == MEASURE_TIME_LAP)
+	{
+		if (strcmp(recvBuff, "-1") == 0)
+		{
+			cout << "Measure time started now." << endl << "The next request for measuring time will return the time measurement." << endl;
+		}
+		else
+		{
+			cout << "The time measurement between both requests is: " << recvBuff << " secondes" << endl;
+		}
+	}
+	else
+	{
+		cout << recvBuff << endl;
+	}
+}
+
+bool notInRange(int input)
+{
+	if (input < 1 || input > 14)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void getUserInput(int* userInput)
+{
+	int input;
+	cin >> input;
+
+	while (!notInRange(input))
+	{
+		cout << "The input is not valid. Please choose a number from the options in the menu" << endl << endl;
+		printUserMenu();
+		cin >> input;
+	}
+
+	*userInput = input;
+}
+
+void printUserMenuCities()
+{
+	std::cout << "Please choose a city (enter a number or a name city thats not on the list):" << endl;
+	std::cout << "1. Tokyo - Japan" << endl;
+	std::cout << "2. Melbourne - Australia" << endl;
+	std::cout << "3. San Francisco - US" << endl;
+	std::cout << "4. Porto - Portugal " << endl;
+	std::cout << "5. Cities not listed above - Please indicate which city (up to 20 letters!!) " << endl;
+}
+
+void getUserInputCities(int* city, char* cityInput)
+{
+
+	char temp;
+	scanf("%c", &temp); // temp statement to clear buffer
+	fgets(cityInput, 21, stdin);
+
+	if (strcmp(cityInput, "1\n") == 0)
+	{
+		*city = TOKYO;
+	}
+	else if (strcmp(cityInput, "2\n") == 0)
+	{
+		*city = MELBOURNE;
+	}
+	else if (strcmp(cityInput, "3\n") == 0)
+	{
+		*city = SAN_FRANCISCO;
+	}
+	else if (strcmp(cityInput, "4\n") == 0)
+	{
+		*city = PORTO;
+	}
+	else {
+		*city = UTC;
+	}
 }
