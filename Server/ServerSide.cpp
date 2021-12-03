@@ -150,23 +150,6 @@ void main()
 			// Parse the current time to printable string.
 			strcpy(sendBuff, ctime(&timer));
 			sendBuff[strlen(sendBuff) - 1] = '\0'; //to remove the new-line from the created string
-	
-			/*
-			time_t t = time(NULL);
-			struct tm tm = *localtime(&t);
-			printf("now: %d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-			sprintf(sendBuff, "%d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-			*/
-
-
-			/*
-			time_t rawtime;
-			struct tm * timeinfo;
-
-			time(&rawtime);
-			timeinfo = localtime(&rawtime);
-			printf("Current local time and date: %s", asctime(timeinfo));
-			*/
 		}
 		else if (strcmp(recvBuff, "2") == 0)
 		{
